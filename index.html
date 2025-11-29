@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Babi-Flix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      background: url("https://images.unsplash.com/photo-1524985069026-dd778a71c7b4") 
+                  no-repeat center center/cover;
+      color: white;
+    }
+
+    .overlay {
+      background: rgba(0, 0, 0, 0.75);
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .logo {
+      font-size: 42px;
+      font-weight: bold;
+      color: red;
+      margin-bottom: 15px;
+      letter-spacing: 2px;
+    }
+
+    .slogan {
+      font-size: 16px;
+      opacity: 0.9;
+      margin-bottom: 30px;
+      max-width: 300px;
+    }
+
+    .btn {
+      background: red;
+      color: white;
+      border: none;
+      padding: 14px 35px;
+      font-size: 18px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #c40000;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 15px;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+  </style>
+
+</head>
+<body>
+
+  <div class="overlay">
+    <div class="logo">BABI-FLIX</div>
+    <div class="slogan">Le cinéma africain et mondial à portée de main</div>
+
+    <button class="btn" onclick="goToAccess()">Accéder</button>
+
+    <div class="footer">© 2025 Babi-Flix</div>
+  </div>
+
+  <script>
+    function goToAccess() {
+      window.location.href = "acces.html";
+    }
+  </script>
+
+</body>
+</html>
