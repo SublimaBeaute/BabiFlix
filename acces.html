@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Accès - Babi-Flix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+    body { height:100vh; background:url("https://images.unsplash.com/photo-1517602302552-471fe67acf66") no-repeat center center/cover; color:white; }
+    .overlay { background:rgba(0,0,0,0.8); height:100%; width:100%; display:flex; justify-content:center; align-items:center; padding:20px; }
+    .login-box { background:#111; width:100%; max-width:350px; padding:25px; border-radius:10px; text-align:center; }
+    .logo { color:red; font-size:28px; font-weight:bold; margin-bottom:20px; letter-spacing:2px; }
+    input { width:100%; padding:12px; border:none; border-radius:5px; margin-bottom:15px; font-size:16px; outline:none; }
+    button { width:100%; padding:12px; background:red; color:white; border:none; border-radius:5px; font-size:17px; cursor:pointer; transition:0.3s; }
+    button:hover { background:#c40000; }
+    #message { margin-top:12px; font-size:14px; }
+    .back { margin-top:18px; display:inline-block; font-size:13px; color:#aaa; text-decoration:none; }
+  </style>
+</head>
+<body>
+
+  <div class="overlay">
+    <div class="login-box">
+      <div class="logo">BABI-FLIX</div>
+      <p>Entrez votre code d’accès</p><br>
+      <input type="text" id="code" placeholder="Ex : BF-2025">
+      <button onclick="verifierCode()">Valider</button>
+      <p id="message"></p>
+      <a href="index.html" class="back">← Retour à l’accueil</a>
+    </div>
+  </div>
+
+  <script>
+    async function verifierCode() {
+      const codeEntre = document.getElementById("code").value.trim();
+      const message = document.getElementById("message");
+
+      if(!codeEntre){
+        message.style.color = "red";
+        message.textContent = "❌ Veuillez entrer un code.";
+        return;
+      }
+
+      try {
+        // 🔹 Remplace simplement ce lien par ton Google Script Web App ou GitHub Pages JSON
+        const response = await fetch("TON_LIEN_JSON_ICI"); 
+        const codes = await response.json();
+
+        // Vérifie si le code existe et est actif
+        if(codes[codeEntre] === true){
+          message.style.color = "lightgreen";
+          message.textContent = "✅ Code valide... connexion en cours";
+
+          // Stocke le code pour la session
+          localStorage.setItem("babi_code", codeEntre);
+
+          // Redirection vers films.html après 1 seconde
+          setTimeout(() => {
+            window.location.href = "films.html";
+          }, 1000);
+
+        } else {
+          message.style.color = "red";
+          message.textContent = "❌ Code invalide. Veuillez réessayer.";
+        }
+
+      } catch (error) {
+        console.error(error);
+        message.style.color = "red";
+        message.textContent = "❌ Une erreur est survenue. Réessayez.";
+      }
+    }
+  </script>
+
+</body>
+</html>
