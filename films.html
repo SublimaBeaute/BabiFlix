@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Babi-Flix - Version Finale</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+  body, html { width:100%; height:100%; background:#000; color:white; overflow-x:hidden; }
+
+  header { background:#000; color:red; font-size:24px; font-weight:bold; text-align:center; padding:15px; border-bottom:1px solid #222; }
+
+  #overlay {
+    display:none;
+    position:fixed;
+    top:0; left:0;
+    width:100vw; height:100vh;
+    background:rgba(0,0,0,0.95);
+    z-index:9999;
+    transform: rotate(90deg);
+    transform-origin: center center;
+  }
+  #overlay iframe {
+    width:100vh;
+    height:100vw;
+    border:none;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
+  }
+  #overlay .info {
+    position:absolute;
+    bottom:10%;
+    left:50%;
+    transform:translateX(-50%);
+    text-align:center;
+    color:white;
+    background:rgba(0,0,0,0.6);
+    padding:10px 15px;
+    border-radius:10px;
+    font-size:16px;
+    max-width:90%;
+  }
+  #overlay .close-btn {
+    position:absolute;
+    top:20px;
+    left:20px;
+    background:red;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:16px;
+    z-index:10000;
+  }
+
+  .films-container {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+    gap:15px;
+    padding:15px;
+  }
+  .film {
+    background:#111;
+    border-radius:10px;
+    overflow:hidden;
+    cursor:pointer;
+    transition:0.3s;
+    position:relative;
+  }
+  .film:hover {
+    transform: scale(1.08);
+    box-shadow:0 0 20px rgba(255,0,0,0.6);
+  }
+  .film video, .film img {
+    width:100%;
+    height:250px;
+    object-fit:cover;
+    display:block;
+  }
+  .film-info {
+    position:absolute;
+    bottom:0;
+    width:100%;
+    background:rgba(0,0,0,0.6);
+    color:white;
+    padding:5px;
+    text-align:center;
+    opacity:0;
+    transition:0.3s;
+  }
+  .film:hover .film-info {
+    opacity:1;
+  }
+</style>
+</head>
+<body>
+
+<header>BABI-FLIX (Version Finale)</header>
+
+<div id="overlay">
+  <button class="close-btn" onclick="closeOverlay()">X</button>
+  <iframe id="player" allowfullscreen></iframe>
+  <div class="info" id="overlayInfo"></div>
+</div>
+
+<div class="films-container" id="films"></div>
+
+<script>
+// ------------------ Vérification instantanée ------------------
+const JSON_URL = "TON_LIEN_JSON_ICI"; // ← Remplace par ton URL Google Script
+
+async function verifierCodeInstant() {
+  const code = localStorage.getItem("babi_code");
+  if (!code) {
+    window.location.href = "acces.html";
+    return false;
+  }
+
+  try {
+    const res = await fetch(JSON_URL);
+    const data = await res.json();
+
+    if (!data[code]) {
+      alert("Votre code n'est plus valide !");
+      localStorage.removeItem("babi_code");
+      window.location.href = "acces.html";
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("Erreur de vérification du code :", err);
+    return false;
+  }
+}
+
+// Vérification au chargement
+verifierCodeInstant();
+
+
+// ------------------ Films ------------------
+const films = [
+  {titre:"Film 1", description:"Action intense et suspense.", image:"https://i.imgur.com/UePbdph.jpg", preview:"https://i.imgur.com/7RzjZbQ.mp4", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
+  {titre:"Film 2", description:"Romance captivante.", image:"https://i.imgur.com/XFZP7mz.jpg", preview:"https://i.imgur.com/3lfQg0k.mp4", youtube:"https://www.youtube.com/embed/ScMzIvxBSi4"},
+  {titre:"Film 3", description:"Comédie hilarante.", image:"https://i.imgur.com/WtOaL5A.jpg", preview:"https://i.imgur.com/L1pU2Jo.mp4", youtube:"https://www.youtube.com/embed/3JZ_D3ELwOQ"},
+  {titre:"Film 4", description:"Film dramatique émouvant.", image:"https://i.imgur.com/KXg6G5E.jpg", preview:"https://i.imgur.com/yX8bT1B.mp4", youtube:"https://www.youtube.com/embed/V-_O7nl0Ii0"},
+  {titre:"Film 5", description:"Thriller haletant.", image:"https://i.imgur.com/9lT2xVd.jpg", preview:"https://i.imgur.com/2jZZlZf.mp4", youtube:"https://www.youtube.com/embed/OPf0YbXqDm0"},
+  {titre:"Film 6", description:"Aventure épique.", image:"https://i.imgur.com/f9qTovh.jpg", preview:"https://i.imgur.com/VcLymxB.mp4", youtube:"https://www.youtube.com/embed/L_jWHffIx5E"},
+  {titre:"Film 7", description:"Science-fiction futuriste.", image:"https://i.imgur.com/wN9R4Dh.jpg", preview:"https://i.imgur.com/E4H8y1Z.mp4", youtube:"https://www.youtube.com/embed/uelHwf8o7_U"},
+  {titre:"Film 8", description:"Animation pour toute la famille.", image:"https://i.imgur.com/Mz2s4uP.jpg", preview:"https://i.imgur.com/F6C6W0g.mp4", youtube:"https://www.youtube.com/embed/YlUKcNNmywk"},
+  {titre:"Film 9", description:"Documentaire captivant.", image:"https://i.imgur.com/Ia9KwFq.jpg", preview:"https://i.imgur.com/6dR0pKn.mp4", youtube:"https://www.youtube.com/embed/fLexgOxsZu0"},
+  {titre:"Film 10", description:"Horreur et frissons garantis.", image:"https://i.imgur.com/9JcRy6N.jpg", preview:"https://i.imgur.com/JR2R6Gh.mp4", youtube:"https://www.youtube.com/embed/kJQP7kiw5Fk"}
+];
+
+const container = document.getElementById("films");
+const overlay = document.getElementById("overlay");
+const player = document.getElementById("player");
+const overlayInfo = document.getElementById("overlayInfo");
+
+function openOverlay(film) {
+  verifierCodeInstant().then(valid => {
+    if (!valid) return; // Code invalide → stop
+    player.src = film.youtube + "?controls=0&modestbranding=1&rel=0";
+    overlayInfo.innerHTML = `<strong>${film.titre}</strong><br>${film.description}`;
+    overlay.style.display = "block";
+  });
+}
+
+function closeOverlay() {
+  overlay.style.display = "none";
+  player.src = "";
+  overlayInfo.innerHTML = "";
+}
+
+films.forEach(film => {
+  const div = document.createElement("div");
+  div.className = "film";
+  
+  const media = document.createElement(film.preview ? "video" : "img");
+  if(film.preview){
+    media.src = film.preview;
+    media.autoplay = true;
+    media.muted = true;
+    media.loop = true;
+  } else {
+    media.src = film.image;
+  }
+  
+  const info = document.createElement("div");
+  info.className = "film-info";
+  info.innerHTML = `<h3>${film.titre}</h3><p>${film.description}</p>`;
+  
+  div.appendChild(media);
+  div.appendChild(info);
+  div.onclick = ()=>openOverlay(film);
+  container.appendChild(div);
+});
+</script>
+
+</body>
+</html>
