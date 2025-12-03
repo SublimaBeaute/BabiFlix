@@ -15,34 +15,24 @@
     position:fixed;
     top:0; left:0;
     width:100vw; height:100vh;
-    background:rgba(0,0,0,0.95);
+    background:#000;
     z-index:9999;
   }
 
-  #overlay iframe {
-    width:90vw;
-    height:50vw;  /* format horizontal */
-    max-height:90vh; /* réduit un peu pour cacher le titre Odysee */
-    border:none;
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform: translate(-50%, -50%);
+  #overlay .video-container {
+    position:relative;
+    width:100%;
+    height:100%;
     overflow:hidden;
   }
 
-  #overlay .info {
+  #overlay iframe {
     position:absolute;
-    bottom:5%;
-    left:50%;
-    transform:translateX(-50%);
-    text-align:center;
-    color:white;
-    background:rgba(0,0,0,0.6);
-    padding:10px 15px;
-    border-radius:10px;
-    font-size:16px;
-    max-width:90%;
+    top:-40px; /* cache le haut Odysee */
+    left:0;
+    width:100%;
+    height:calc(100% + 40px);
+    border:none;
   }
 
   #overlay .close-btn {
@@ -62,46 +52,45 @@
   .films-container {
     display:grid;
     grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
-    gap:20px;
-    padding:20px;
+    gap:15px;
+    padding:15px;
   }
 
   .film {
     background:#111;
-    border-radius:12px;
+    border-radius:10px;
     overflow:hidden;
     cursor:pointer;
     transition:0.3s;
     position:relative;
-    box-shadow:0 0 10px rgba(255,0,0,0.3);
   }
 
   .film:hover {
-    transform: scale(1.05);
-    box-shadow:0 0 20px rgba(255,0,0,0.8);
+    transform: scale(1.08);
+    box-shadow:0 0 20px rgba(255,0,0,0.6);
   }
 
-  .film img {
+  .film video, .film img {
     width:100%;
-    height:260px;
+    height:250px;
     object-fit:cover;
     display:block;
   }
 
   .film-info {
-    padding:10px;
-    background:linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.4));
+    position:absolute;
+    bottom:0;
+    width:100%;
+    background:rgba(0,0,0,0.6);
+    color:white;
+    padding:5px;
+    text-align:center;
+    opacity:0;
+    transition:0.3s;
   }
 
-  .film-info h3 {
-    font-size:16px;
-    color:#fff;
-    margin-bottom:5px;
-  }
-
-  .film-info p {
-    font-size:13px;
-    color:#ccc;
+  .film:hover .film-info {
+    opacity:1;
   }
 </style>
 </head>
@@ -111,15 +100,16 @@
 
 <div id="overlay">
   <button class="close-btn" onclick="closeOverlay()">X</button>
-  <iframe id="player" allowfullscreen></iframe>
-  <div class="info" id="overlayInfo"></div>
+  <div class="video-container">
+    <iframe id="player" allowfullscreen></iframe>
+  </div>
 </div>
 
 <div class="films-container" id="films"></div>
 
 <script>
 // ------------------ Vérification instantanée ------------------
-const JSON_URL = "https://script.google.com/macros/s/AKfycbw8wo-q79mnWgnHZQXxqU07EVIVbSFfj3onOal23oC7LJTgyZnhm1a452bwUTuU3Eoj/exec";
+const JSON_URL = "TON_LIEN_JSON_ICI";
 
 async function verifierCodeInstant() {
   const code = localStorage.getItem("babi_code");
@@ -147,46 +137,73 @@ async function verifierCodeInstant() {
 
 verifierCodeInstant();
 
-// ------------------ Films (Titanic x20) ------------------
-const films = Array(20).fill({
-  titre:"Titanic (Version Française)",
-  description:"Une histoire d’amour légendaire sur fond de tragédie maritime.",
-  image:"https://i.imgur.com/UePbdph.jpg",
-  youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6"
-});
+
+// ------------------ Films (ODYSÉE TITANIC TEMPORAIRE) ------------------
+const ODYSEE_URL = "https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6";
+
+const films = [
+  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/UePbdph.jpg", preview:"https://i.imgur.com/7RzjZbQ.mp4", odysee:ODYSEE_URL},
+  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/XFZP7mz.jpg", preview:"https://i.imgur.com/3lfQg0k.mp4", odysee:ODYSEE_URL},
+  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/WtOaL5A.jpg", preview:"https://i.imgur.com/L1pU2Jo.mp4", odysee:ODYSEE_URL},
+  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/KXg6G5E.jpg", preview:"https://i.imgur.com/yX8bT1B.mp4", odysee:ODYSEE_URL},
+  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/9lT2xVd.jpg", preview:"https://i.imgur.com/2jZZlZf.mp4", odysee:ODYSEE_URL},
+  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/f9qTovh.jpg", preview:"https://i.imgur.com/VcLymxB.mp4", odysee:ODYSEE_URL},
+  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/wN9R4Dh.jpg", preview:"https://i.imgur.com/E4H8y1Z.mp4", odysee:ODYSEE_URL},
+  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/Mz2s4uP.jpg", preview:"https://i.imgur.com/F6C6W0g.mp4", odysee:ODYSEE_URL},
+  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/Ia9KwFq.jpg", preview:"https://i.imgur.com/6dR0pKn.mp4", odysee:ODYSEE_URL},
+  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/9JcRy6N.jpg", preview:"https://i.imgur.com/JR2R6Gh.mp4", odysee:ODYSEE_URL}
+];
 
 const container = document.getElementById("films");
 const overlay = document.getElementById("overlay");
 const player = document.getElementById("player");
-const overlayInfo = document.getElementById("overlayInfo");
 
 function openOverlay(film) {
   verifierCodeInstant().then(valid => {
     if (!valid) return;
-    player.src = film.youtube;
-    overlayInfo.innerHTML = `<strong>${film.titre}</strong><br>${film.description}`;
+
+    player.src = film.odysee;
     overlay.style.display = "block";
+
+    // Plein écran
+    const fs = overlay.requestFullscreen || overlay.webkitRequestFullscreen || overlay.msRequestFullscreen;
+    if (fs) fs.call(overlay);
+
+    // Orientation horizontale
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock("landscape").catch(()=>{});
+    }
   });
 }
 
 function closeOverlay() {
   overlay.style.display = "none";
   player.src = "";
-  overlayInfo.innerHTML = "";
+
+  if (screen.orientation && screen.orientation.unlock) {
+    screen.orientation.unlock();
+  }
+
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  }
 }
 
 films.forEach(film => {
   const div = document.createElement("div");
   div.className = "film";
-  
-  const img = document.createElement("img");
-  img.src = film.image;
+
+  const media = document.createElement("video");
+  media.src = film.preview;
+  media.autoplay = true;
+  media.muted = true;
+  media.loop = true;
 
   const info = document.createElement("div");
   info.className = "film-info";
   info.innerHTML = `<h3>${film.titre}</h3><p>${film.description}</p>`;
-  
-  div.appendChild(img);
+
+  div.appendChild(media);
   div.appendChild(info);
   div.onclick = ()=>openOverlay(film);
   container.appendChild(div);
