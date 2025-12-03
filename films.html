@@ -17,21 +17,23 @@
     width:100vw; height:100vh;
     background:rgba(0,0,0,0.95);
     z-index:9999;
-    transform: rotate(90deg);
-    transform-origin: center center;
   }
+
   #overlay iframe {
-    width:100vh;
-    height:100vw;
+    width:90vw;
+    height:50vw;  /* format horizontal */
+    max-height:90vh; /* réduit un peu pour cacher le titre Odysee */
     border:none;
     position:absolute;
     top:50%;
     left:50%;
     transform: translate(-50%, -50%);
+    overflow:hidden;
   }
+
   #overlay .info {
     position:absolute;
-    bottom:10%;
+    bottom:5%;
     left:50%;
     transform:translateX(-50%);
     text-align:center;
@@ -42,6 +44,7 @@
     font-size:16px;
     max-width:90%;
   }
+
   #overlay .close-btn {
     position:absolute;
     top:20px;
@@ -59,40 +62,46 @@
   .films-container {
     display:grid;
     grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
-    gap:15px;
-    padding:15px;
+    gap:20px;
+    padding:20px;
   }
+
   .film {
     background:#111;
-    border-radius:10px;
+    border-radius:12px;
     overflow:hidden;
     cursor:pointer;
     transition:0.3s;
     position:relative;
+    box-shadow:0 0 10px rgba(255,0,0,0.3);
   }
+
   .film:hover {
-    transform: scale(1.08);
-    box-shadow:0 0 20px rgba(255,0,0,0.6);
+    transform: scale(1.05);
+    box-shadow:0 0 20px rgba(255,0,0,0.8);
   }
-  .film video, .film img {
+
+  .film img {
     width:100%;
-    height:250px;
+    height:260px;
     object-fit:cover;
     display:block;
   }
+
   .film-info {
-    position:absolute;
-    bottom:0;
-    width:100%;
-    background:rgba(0,0,0,0.6);
-    color:white;
-    padding:5px;
-    text-align:center;
-    opacity:0;
-    transition:0.3s;
+    padding:10px;
+    background:linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.4));
   }
-  .film:hover .film-info {
-    opacity:1;
+
+  .film-info h3 {
+    font-size:16px;
+    color:#fff;
+    margin-bottom:5px;
+  }
+
+  .film-info p {
+    font-size:13px;
+    color:#ccc;
   }
 </style>
 </head>
@@ -110,7 +119,7 @@
 
 <script>
 // ------------------ Vérification instantanée ------------------
-const JSON_URL = "TON_LIEN_JSON_ICI"; // ← Remplace par ton URL Google Script
+const JSON_URL = "https://script.google.com/macros/s/AKfycbw8wo-q79mnWgnHZQXxqU07EVIVbSFfj3onOal23oC7LJTgyZnhm1a452bwUTuU3Eoj/exec";
 
 async function verifierCodeInstant() {
   const code = localStorage.getItem("babi_code");
@@ -136,23 +145,15 @@ async function verifierCodeInstant() {
   }
 }
 
-// Vérification au chargement
 verifierCodeInstant();
 
-
-// ------------------ Films ------------------
-const films = [
-  {titre:"Film 1", description:"Action intense et suspense.", image:"https://i.imgur.com/UePbdph.jpg", preview:"https://i.imgur.com/7RzjZbQ.mp4", youtube:"https://www.youtube.com/embed/dQw4w9WgXcQ"},
-  {titre:"Film 2", description:"Romance captivante.", image:"https://i.imgur.com/XFZP7mz.jpg", preview:"https://i.imgur.com/3lfQg0k.mp4", youtube:"https://www.youtube.com/embed/ScMzIvxBSi4"},
-  {titre:"Film 3", description:"Comédie hilarante.", image:"https://i.imgur.com/WtOaL5A.jpg", preview:"https://i.imgur.com/L1pU2Jo.mp4", youtube:"https://www.youtube.com/embed/3JZ_D3ELwOQ"},
-  {titre:"Film 4", description:"Film dramatique émouvant.", image:"https://i.imgur.com/KXg6G5E.jpg", preview:"https://i.imgur.com/yX8bT1B.mp4", youtube:"https://www.youtube.com/embed/V-_O7nl0Ii0"},
-  {titre:"Film 5", description:"Thriller haletant.", image:"https://i.imgur.com/9lT2xVd.jpg", preview:"https://i.imgur.com/2jZZlZf.mp4", youtube:"https://www.youtube.com/embed/OPf0YbXqDm0"},
-  {titre:"Film 6", description:"Aventure épique.", image:"https://i.imgur.com/f9qTovh.jpg", preview:"https://i.imgur.com/VcLymxB.mp4", youtube:"https://www.youtube.com/embed/L_jWHffIx5E"},
-  {titre:"Film 7", description:"Science-fiction futuriste.", image:"https://i.imgur.com/wN9R4Dh.jpg", preview:"https://i.imgur.com/E4H8y1Z.mp4", youtube:"https://www.youtube.com/embed/uelHwf8o7_U"},
-  {titre:"Film 8", description:"Animation pour toute la famille.", image:"https://i.imgur.com/Mz2s4uP.jpg", preview:"https://i.imgur.com/F6C6W0g.mp4", youtube:"https://www.youtube.com/embed/YlUKcNNmywk"},
-  {titre:"Film 9", description:"Documentaire captivant.", image:"https://i.imgur.com/Ia9KwFq.jpg", preview:"https://i.imgur.com/6dR0pKn.mp4", youtube:"https://www.youtube.com/embed/fLexgOxsZu0"},
-  {titre:"Film 10", description:"Horreur et frissons garantis.", image:"https://i.imgur.com/9JcRy6N.jpg", preview:"https://i.imgur.com/JR2R6Gh.mp4", youtube:"https://www.youtube.com/embed/kJQP7kiw5Fk"}
-];
+// ------------------ Films (Titanic x20) ------------------
+const films = Array(20).fill({
+  titre:"Titanic (Version Française)",
+  description:"Une histoire d’amour légendaire sur fond de tragédie maritime.",
+  image:"https://i.imgur.com/UePbdph.jpg",
+  youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6"
+});
 
 const container = document.getElementById("films");
 const overlay = document.getElementById("overlay");
@@ -161,8 +162,8 @@ const overlayInfo = document.getElementById("overlayInfo");
 
 function openOverlay(film) {
   verifierCodeInstant().then(valid => {
-    if (!valid) return; // Code invalide → stop
-    player.src = film.youtube + "?controls=0&modestbranding=1&rel=0";
+    if (!valid) return;
+    player.src = film.youtube;
     overlayInfo.innerHTML = `<strong>${film.titre}</strong><br>${film.description}`;
     overlay.style.display = "block";
   });
@@ -178,21 +179,14 @@ films.forEach(film => {
   const div = document.createElement("div");
   div.className = "film";
   
-  const media = document.createElement(film.preview ? "video" : "img");
-  if(film.preview){
-    media.src = film.preview;
-    media.autoplay = true;
-    media.muted = true;
-    media.loop = true;
-  } else {
-    media.src = film.image;
-  }
-  
+  const img = document.createElement("img");
+  img.src = film.image;
+
   const info = document.createElement("div");
   info.className = "film-info";
   info.innerHTML = `<h3>${film.titre}</h3><p>${film.description}</p>`;
   
-  div.appendChild(media);
+  div.appendChild(img);
   div.appendChild(info);
   div.onclick = ()=>openOverlay(film);
   container.appendChild(div);
