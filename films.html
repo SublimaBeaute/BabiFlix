@@ -8,50 +8,44 @@
   * { box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
   body, html { width:100%; height:100%; background:#000; color:white; overflow-x:hidden; }
 
-  header { background:#000; color:red; font-size:24px; font-weight:bold; text-align:center; padding:15px; border-bottom:1px solid #222; }
+  header {
+    background:#000;
+    color:red;
+    font-size:24px;
+    font-weight:bold;
+    text-align:center;
+    padding:15px;
+    border-bottom:1px solid #222;
+  }
 
   #overlay {
     display:none;
     position:fixed;
     top:0; left:0;
     width:100vw; height:100vh;
-    background:rgba(0,0,0,0.95);
+    background:#000;
     z-index:9999;
-    transform: rotate(90deg);
-    transform-origin: center center;
+    overflow:hidden;
   }
+
   #overlay iframe {
-    width:100vh;
-    height:100vw;
+    position:absolute;
+    top:-100px;
+    left:0;
+    width:100%;
+    height:calc(100% + 170px);
     border:none;
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform: translate(-50%, -50%);
   }
-  #overlay .info {
+
+  .close-btn {
     position:absolute;
-    bottom:10%;
-    left:50%;
-    transform:translateX(-50%);
-    text-align:center;
-    color:white;
-    background:rgba(0,0,0,0.6);
-    padding:10px 15px;
-    border-radius:10px;
-    font-size:16px;
-    max-width:90%;
-  }
-  #overlay .close-btn {
-    position:absolute;
-    top:20px;
-    left:20px;
+    top:15px;
+    left:15px;
     background:red;
     color:white;
     border:none;
     padding:10px 15px;
     border-radius:5px;
-    cursor:pointer;
     font-size:16px;
     z-index:10000;
   }
@@ -62,6 +56,7 @@
     gap:15px;
     padding:15px;
   }
+
   .film {
     background:#111;
     border-radius:10px;
@@ -70,30 +65,30 @@
     transition:0.3s;
     position:relative;
   }
+
   .film:hover {
     transform: scale(1.08);
     box-shadow:0 0 20px rgba(255,0,0,0.6);
   }
+
   .film img {
     width:100%;
     height:250px;
     object-fit:cover;
-    display:block;
   }
+
   .film-info {
     position:absolute;
     bottom:0;
     width:100%;
-    background:rgba(0,0,0,0.6);
-    color:white;
-    padding:5px;
-    text-align:center;
+    background:rgba(0,0,0,0.7);
+    padding:8px;
+    font-size:13px;
     opacity:0;
     transition:0.3s;
   }
-  .film:hover .film-info {
-    opacity:1;
-  }
+
+  .film:hover .film-info { opacity:1; }
 </style>
 </head>
 <body>
@@ -103,16 +98,13 @@
 <div id="overlay">
   <button class="close-btn" onclick="closeOverlay()">X</button>
   <iframe id="player" allowfullscreen></iframe>
-  <div class="info" id="overlayInfo"></div>
 </div>
 
 <div class="films-container" id="films"></div>
 
 <script>
-// ✅ TON VRAI LIEN JSON
 const JSON_URL = "https://script.google.com/macros/s/AKfycbw8wo-q79mnWgnHZQXxqU07EVIVbSFfj3onOal23oC7LJTgyZnhm1a452bwUTuU3Eoj/exec";
 
-// ------------------ Vérification instantanée ------------------
 async function verifierCodeInstant() {
   const code = localStorage.getItem("babi_code");
   if (!code) {
@@ -123,7 +115,6 @@ async function verifierCodeInstant() {
   try {
     const res = await fetch(JSON_URL);
     const data = await res.json();
-
     if (!data[code]) {
       alert("Votre code n'est plus valide !");
       localStorage.removeItem("babi_code");
@@ -131,55 +122,97 @@ async function verifierCodeInstant() {
       return false;
     }
     return true;
-  } catch (err) {
-    console.error("Erreur de vérification du code :", err);
+  } catch(e){
     return false;
   }
 }
-
-// Vérification au chargement
 verifierCodeInstant();
 
-
-// ------------------ Films ------------------
 const films = [
-  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/UePbdph.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6"},
-  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/UePbdph.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6"},
-  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/UePbdph.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6"},
-  {titre:"Titanic", description:"Film romantique et dramatique.", image:"https://i.imgur.com/UePbdph.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6"}
+  {
+    titre:"Titanic",
+    image:"image1.jpg",
+    youtube:"https://odysee.com/$/embed/@TicTac:8/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6",
+    description:"Une histoire d’amour tragique entre Jack et Rose à bord du légendaire Titanic."
+  },
+
+  { titre:"Film 2", image:"image2.jpg", youtube:"https://odysee.com/$/embed/video2", description:"Film d’action explosif." },
+  { titre:"Film 3", image:"image3.jpg", youtube:"https://odysee.com/$/embed/video3", description:"Drame poignant." },
+  { titre:"Film 4", image:"image4.jpg", youtube:"https://odysee.com/$/embed/video4", description:"Thriller haletant." },
+  { titre:"Film 5", image:"image5.jpg", youtube:"https://odysee.com/$/embed/video5", description:"Comédie romantique." },
+
+  { titre:"Film 6", image:"image6.jpg", youtube:"https://odysee.com/$/embed/video6", description:"Aventure spectaculaire." },
+  { titre:"Film 7", image:"image7.jpg", youtube:"https://odysee.com/$/embed/video7", description:"Science-fiction futuriste." },
+  { titre:"Film 8", image:"image8.jpg", youtube:"https://odysee.com/$/embed/video8", description:"Film historique." },
+  { titre:"Film 9", image:"image9.jpg", youtube:"https://odysee.com/$/embed/video9", description:"Enquête policière." },
+  { titre:"Film 10", image:"image10.jpg", youtube:"https://odysee.com/$/embed/video10", description:"Film d’horreur intense." },
+
+  { titre:"Film 11", image:"image11.jpg", youtube:"https://odysee.com/$/embed/video11", description:"Émotion garantie." },
+  { titre:"Film 12", image:"image12.jpg", youtube:"https://odysee.com/$/embed/video12", description:"Suspense total." },
+  { titre:"Film 13", image:"image13.jpg", youtube:"https://odysee.com/$/embed/video13", description:"Aventure familiale." },
+  { titre:"Film 14", image:"image14.jpg", youtube:"https://odysee.com/$/embed/video14", description:"Action non-stop." },
+  { titre:"Film 15", image:"image15.jpg", youtube:"https://odysee.com/$/embed/video15", description:"Drame romantique." },
+
+  { titre:"Film 16", image:"image16.jpg", youtube:"https://odysee.com/$/embed/video16", description:"Film catastrophe." },
+  { titre:"Film 17", image:"image17.jpg", youtube:"https://odysee.com/$/embed/video17", description:"Film mystère." },
+  { titre:"Film 18", image:"image18.jpg", youtube:"https://odysee.com/$/embed/video18", description:"Film biographique." },
+  { titre:"Film 19", image:"image19.jpg", youtube:"https://odysee.com/$/embed/video19", description:"Action militaire." },
+  { titre:"Film 20", image:"image20.jpg", youtube:"https://odysee.com/$/embed/video20", description:"Film de survie." },
+
+  { titre:"Film 21", image:"image21.jpg", youtube:"https://odysee.com/$/embed/video21", description:"Film de braquage." },
+  { titre:"Film 22", image:"image22.jpg", youtube:"https://odysee.com/$/embed/video22", description:"Film judiciaire." },
+  { titre:"Film 23", image:"image23.jpg", youtube:"https://odysee.com/$/embed/video23", description:"Histoire vraie." },
+  { titre:"Film 24", image:"image24.jpg", youtube:"https://odysee.com/$/embed/video24", description:"Drame social." },
+  { titre:"Film 25", image:"image25.jpg", youtube:"https://odysee.com/$/embed/video25", description:"Film psychologique." },
+
+  { titre:"Film 26", image:"image26.jpg", youtube:"https://odysee.com/$/embed/video26", description:"Film d'espionnage." },
+  { titre:"Film 27", image:"image27.jpg", youtube:"https://odysee.com/$/embed/video27", description:"Film fantastique." },
+  { titre:"Film 28", image:"image28.jpg", youtube:"https://odysee.com/$/embed/video28", description:"Film jeunesse." },
+  { titre:"Film 29", image:"image29.jpg", youtube:"https://odysee.com/$/embed/video29", description:"Film de guerre." },
+  { titre:"Film 30", image:"image30.jpg", youtube:"https://odysee.com/$/embed/video30", description:"Film épique." }
 ];
 
 const container = document.getElementById("films");
 const overlay = document.getElementById("overlay");
 const player = document.getElementById("player");
-const overlayInfo = document.getElementById("overlayInfo");
 
 function openOverlay(film) {
   verifierCodeInstant().then(valid => {
     if (!valid) return;
-    player.src = film.youtube;
-    overlayInfo.innerHTML = `<strong>${film.titre}</strong><br>${film.description}`;
+
     overlay.style.display = "block";
+
+    setTimeout(() => {
+      player.src = film.youtube + "?autoplay=1&mute=0";
+    }, 600);
+
+    setTimeout(() => {
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock("landscape").catch(()=>{});
+      }
+    }, 900);
   });
 }
 
 function closeOverlay() {
   overlay.style.display = "none";
   player.src = "";
-  overlayInfo.innerHTML = "";
+  if (screen.orientation && screen.orientation.unlock) {
+    screen.orientation.unlock();
+  }
 }
 
 films.forEach(film => {
   const div = document.createElement("div");
   div.className = "film";
-  
+
   const img = document.createElement("img");
   img.src = film.image;
-  
+
   const info = document.createElement("div");
   info.className = "film-info";
-  info.innerHTML = `<h3>${film.titre}</h3><p>${film.description}</p>`;
-  
+  info.innerHTML = `<strong>${film.titre}</strong><br>${film.description}`;
+
   div.appendChild(img);
   div.appendChild(info);
   div.onclick = ()=>openOverlay(film);
