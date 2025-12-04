@@ -4,230 +4,142 @@
 <meta charset="UTF-8">
 <title>Babi-Flix - Version Finale</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
 <style>
-* { box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
-body, html { width:100%; height:100%; background:#000; color:white; }
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif}
+body,html{width:100%;height:100%;background:#000;color:#fff}
+header{background:#000;color:red;font-size:24px;font-weight:bold;text-align:center;padding:15px;border-bottom:1px solid #222}
 
-header {
-  background:#000;
-  color:red;
-  font-size:24px;
-  font-weight:bold;
-  text-align:center;
-  padding:15px;
-  border-bottom:1px solid #222;
-}
+#overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:9999;overflow:hidden}
+#overlay iframe{position:absolute;top:-180px;left:0;width:100%;height:calc(100% + 260px);border:none}
 
-/* OVERLAY */
-#overlay {
-  display:none;
-  position:fixed;
-  top:0; left:0;
-  width:100vw;
-  height:100vh;
-  background:#000;
-  z-index:9999;
-  overflow:hidden;
-}
+.close-btn{position:absolute;top:15px;right:15px;background:red;color:white;border:none;padding:10px 15px;border-radius:5px;font-size:16px;z-index:10001}
 
-#player {
-  position:absolute;
-  top:50%;
-  left:50%;
-  width:100vh;
-  height:100vw;
-  transform:translate(-50%,-50%) rotate(90deg);
-  border:none;
-}
+#loader{position:absolute;width:100%;height:100%;background:#000;display:flex;justify-content:center;align-items:center;flex-direction:column;color:white;z-index:10000}
+#progress{margin-top:15px;font-size:20px}
 
-.close-btn {
-  position:absolute;
-  top:5px;
-  right:5px;
-  background:red;
-  color:white;
-  border:none;
-  padding:8px 12px;
-  border-radius:5px;
-  font-size:14px;
-  z-index:10005;
-}
-
-/* LOADER */
-#loader {
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  text-align:center;
-  z-index:10001;
-  width:80%;
-}
-
-#progress-text { font-size:18px; margin-bottom:10px; }
-#progress-bar {
-  width:100%;
-  height:10px;
-  background:#333;
-  border-radius:10px;
-  overflow:hidden;
-}
-#progress {
-  height:100%;
-  width:0%;
-  background:red;
-  transition:0.3s;
-}
-
-/* FILMS */
-.films-container {
-  display:grid;
-  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
-  gap:15px;
-  padding:15px;
-}
-
-.film {
-  position:relative;
-  background:#111;
-  border-radius:10px;
-  overflow:hidden;
-  cursor:pointer;
-}
-
-.film img {
-  width:100%;
-  height:250px;
-  object-fit:cover;
-}
-
-.film-info {
-  position:absolute;
-  bottom:0;
-  left:0;
-  width:100%;
-  background:rgba(0,0,0,0.7);
-  padding:10px;
-  font-size:13px;
-  opacity:0;
-  transition:0.3s;
-}
-.film:hover .film-info { opacity:1; }
+.films-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;padding:15px}
+.film{background:#111;border-radius:10px;overflow:hidden;cursor:pointer;transition:.3s;position:relative}
+.film:hover{transform:scale(1.05);box-shadow:0 0 15px red}
+.film img{width:100%;height:250px;object-fit:cover}
+.film-info{position:absolute;bottom:0;background:rgba(0,0,0,.7);width:100%;padding:10px;font-size:13px;opacity:0;transition:.3s}
+.film:hover .film-info{opacity:1}
 </style>
 </head>
 
 <body>
 
-<header>BABI-FLIX (Version Finale)</header>
+<header>BABI-FLIX</header>
 
 <div id="overlay">
-  <button class="close-btn" onclick="closeOverlay()">X</button>
-
   <div id="loader">
-    <div id="progress-text">Chargement... 0%</div>
-    <div id="progress-bar">
-      <div id="progress"></div>
-    </div>
+    <div>Chargement du film...</div>
+    <div id="progress">0%</div>
   </div>
-
-  <iframe id="player" allow="autoplay; fullscreen"></iframe>
+  <button class="close-btn" onclick="closeOverlay()">X</button>
+  <iframe id="player" allowfullscreen></iframe>
 </div>
 
 <div class="films-container" id="films"></div>
 
 <script>
-
-/* ===== JSON SÉCURITÉ (INCHANGÉ) ===== */
 const JSON_URL = "https://script.google.com/macros/s/AKfycbw8wo-q79mnWgnHZQXxqU07EVIVbSFfj3onOal23oC7LJTgyZnhm1a452bwUTuU3Eoj/exec";
 
-async function verifierCodeInstant() {
+async function verifierCodeInstant(){
   const code = localStorage.getItem("babi_code");
-  if (!code) { window.location.href = "acces.html"; return false; }
+  if(!code){window.location.href="acces.html";return false}
   const res = await fetch(JSON_URL);
   const data = await res.json();
-  if (!data[code]) {
+  if(!data[code]){
     alert("Votre code n'est plus valide !");
     localStorage.removeItem("babi_code");
-    window.location.href = "acces.html";
+    window.location.href="acces.html";
     return false;
   }
   return true;
 }
 verifierCodeInstant();
 
-/* ===== 30 FILMS ÉCRITS UN PAR UN (SANS i) ===== */
-
 const films = [
 {
-  titre:"Titanic",
-  description:"Une histoire d’amour tragique entre Jack et Rose à bord du plus grand paquebot jamais construit. Un film émouvant basé sur une catastrophe réelle.",
-  image:"image1.jpg",
-  youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6"
+ titre:"Titanic",
+ image:"titanic.jpg",
+ youtube:"https://odysee.com/$/embed/@TicTac:8/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6",
+ description:"Une romance tragique et inoubliable entre deux jeunes de classes sociales opposées à bord du plus grand paquebot jamais construit."
 },
-
-{ titre:"Film 2", description:"Film d'action explosif mêlant course contre la montre, complot international et héros solitaire.", image:"image2.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
-{ titre:"Film 3", description:"Drame romantique intense entre deux personnes séparées par le destin.", image:"image3.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
-{ titre:"Film 4", description:"Thriller psychologique où chaque décision peut être fatale.", image:"image4.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
-{ titre:"Film 5", description:"Film d'horreur avec suspense, frissons et révélations terrifiantes.", image:"image5.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
-{ titre:"Film 6", description:"Aventure épique à travers des territoires sauvages et mystiques.", image:"image6.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
-{ titre:"Film 7", description:"Film futuriste sur l’intelligence artificielle et la survie humaine.", image:"image7.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
-{ titre:"Film 8", description:"Comédie romantique légère avec humour et émotions.", image:"image8.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
-{ titre:"Film 9", description:"Guerre, courage, sacrifice et destin au cœur du champ de bataille.", image:"image9.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
-{ titre:"Film 10", description:"Enquête policière complexe menant à une vérité bouleversante.", image:"image10.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
-
-/* Les films 11 à 30 suivent exactement le même principe */
+{titre:"Film 2",image:"film2.jpg",youtube:"https://example.com",description:"Un thriller intense où chaque décision peut coûter la vie."},
+{titre:"Film 3",image:"film3.jpg",youtube:"https://example.com",description:"Un drame familial émouvant sur fond de secrets et de rédemption."},
+{titre:"Film 4",image:"film4.jpg",youtube:"https://example.com",description:"Une aventure spectaculaire dans un monde dangereux et inconnu."},
+{titre:"Film 5",image:"film5.jpg",youtube:"https://example.com",description:"Une histoire d’amour impossible dans un contexte de guerre."},
+{titre:"Film 6",image:"film6.jpg",youtube:"https://example.com",description:"Un polar sombre où la vérité est plus dangereuse que le mensonge."},
+{titre:"Film 7",image:"film7.jpg",youtube:"https://example.com",description:"Un jeune héros confronté à son destin dans un combat épique."},
+{titre:"Film 8",image:"film8.jpg",youtube:"https://example.com",description:"Un film d'action explosif où la survie est en jeu à chaque instant."},
+{titre:"Film 9",image:"film9.jpg",youtube:"https://example.com",description:"Une enquête haletante au cœur d’un vaste complot international."},
+{titre:"Film 10",image:"film10.jpg",youtube:"https://example.com",description:"Un combat intérieur entre le bien et le mal dans un monde violent."},
+{titre:"Film 11",image:"film11.jpg",youtube:"https://example.com",description:"Une ascension fulgurante suivie d’une chute brutale et tragique."},
+{titre:"Film 12",image:"film12.jpg",youtube:"https://example.com",description:"Un groupe d’amis piégés dans une situation sans retour possible."},
+{titre:"Film 13",image:"film13.jpg",youtube:"https://example.com",description:"Une mission secrète où chaque erreur peut être fatale."},
+{titre:"Film 14",image:"film14.jpg",youtube:"https://example.com",description:"Un amour interdit dans une société dominée par la peur."},
+{titre:"Film 15",image:"film15.jpg",youtube:"https://example.com",description:"Une course contre la montre pour éviter une catastrophe mondiale."},
+{titre:"Film 16",image:"film16.jpg",youtube:"https://example.com",description:"Un héros solitaire luttant contre une organisation puissante."},
+{titre:"Film 17",image:"film17.jpg",youtube:"https://example.com",description:"Un passé douloureux qui refait surface au moment le plus inattendu."},
+{titre:"Film 18",image:"film18.jpg",youtube:"https://example.com",description:"Une vengeance méticuleusement préparée pendant des années."},
+{titre:"Film 19",image:"film19.jpg",youtube:"https://example.com",description:"Un destin brisé qui renaît à travers le sacrifice."},
+{titre:"Film 20",image:"film20.jpg",youtube:"https://example.com",description:"Un dernier combat pour sauver ce qui reste de l’humanité."}
 ];
 
-const container = document.getElementById("films");
-const overlay = document.getElementById("overlay");
-const player = document.getElementById("player");
-const loader = document.getElementById("loader");
-const progress = document.getElementById("progress");
-const progressText = document.getElementById("progress-text");
+const container=document.getElementById("films");
+const overlay=document.getElementById("overlay");
+const player=document.getElementById("player");
+const loader=document.getElementById("loader");
+const progress=document.getElementById("progress");
 
-function openOverlay(film) {
-  overlay.style.display = "block";
-  loader.style.display = "block";
-  player.src = "";
-  progress.style.width = "0%";
-  progressText.innerText = "Chargement... 0%";
+function openOverlay(film){
+  verifierCodeInstant().then(valid=>{
+    if(!valid)return;
+    overlay.style.display="block";
+    loader.style.display="flex";
+    progress.textContent="0%";
 
-  let percent = 0;
-  const loading = setInterval(() => {
-    percent += 7;
-    if (percent >= 90) clearInterval(loading);
-    progress.style.width = percent + "%";
-    progressText.innerText = "Chargement... " + percent + "%";
-  }, 130);
+    let p=0;
+    const loading=setInterval(()=>{
+      p+=5;
+      progress.textContent=p+"%";
+      if(p>=100)clearInterval(loading);
+    },100);
 
-  setTimeout(() => {
-    player.src = film.youtube + "?autoplay=1";
-  }, 1200);
+    player.src=film.youtube+"?autoplay=1";
+    player.onload=()=>{loader.style.display="none"};
+
+    setTimeout(()=>{
+      if(screen.orientation&&screen.orientation.lock){
+        screen.orientation.lock("landscape").catch(()=>{});
+      }
+    },700);
+  });
 }
 
-function closeOverlay() {
-  overlay.style.display = "none";
-  player.src = "";
-  loader.style.display = "none";
+function closeOverlay(){
+  overlay.style.display="none";
+  player.src="";
+  if(screen.orientation&&screen.orientation.unlock){
+    screen.orientation.unlock();
+  }
 }
 
-films.forEach(film => {
-  const div = document.createElement("div");
-  div.className = "film";
-
-  const img = document.createElement("img");
-  img.src = film.image;
-
-  const info = document.createElement("div");
-  info.className = "film-info";
-  info.innerHTML = `<strong>${film.titre}</strong><br>${film.description}`;
-
+films.forEach(film=>{
+  const div=document.createElement("div");
+  div.className="film";
+  const img=document.createElement("img");
+  img.src=film.image;
+  const info=document.createElement("div");
+  info.className="film-info";
+  info.innerHTML=`<strong>${film.titre}</strong><br>${film.description}`;
   div.appendChild(img);
   div.appendChild(info);
-  div.onclick = ()=>openOverlay(film);
+  div.onclick=()=>openOverlay(film);
   container.appendChild(div);
 });
-
 </script>
 
 </body>
