@@ -5,90 +5,113 @@
 <title>Babi-Flix - Version Finale</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <style>
-  * { box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
-  body, html { width:100%; height:100%; background:#000; color:white; overflow-x:hidden; }
+* { box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; }
+body, html { width:100%; height:100%; background:#000; color:white; overflow-x:hidden; }
 
-  header {
-    background:#000;
-    color:red;
-    font-size:24px;
-    font-weight:bold;
-    text-align:center;
-    padding:15px;
-    border-bottom:1px solid #222;
-  }
+header {
+  background:#000;
+  color:red;
+  font-size:24px;
+  font-weight:bold;
+  text-align:center;
+  padding:15px;
+  border-bottom:1px solid #222;
+}
 
-  #overlay {
-    display:none;
-    position:fixed;
-    top:0; left:0;
-    width:100vw; height:100vh;
-    background:#000;
-    z-index:9999;
-    overflow:hidden;
-  }
+#overlay {
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100vw; height:100vh;
+  background:#000;
+  z-index:9999;
+  overflow:hidden;
+}
 
-  #overlay iframe {
-    position:absolute;
-    top:-100px;
-    left:0;
-    width:100%;
-    height:calc(100% + 170px);
-    border:none;
-  }
+#overlay iframe {
+  position:absolute;
+  top:-150px;
+  left:0;
+  width:100%;
+  height:calc(100% + 300px);
+  border:none;
+}
 
-  .close-btn {
-    position:absolute;
-    top:15px;
-    left:15px;
-    background:red;
-    color:white;
-    border:none;
-    padding:10px 15px;
-    border-radius:5px;
-    font-size:16px;
-    z-index:10000;
-  }
+.close-btn {
+  position:absolute;
+  top:15px;
+  left:15px;
+  background:red;
+  color:white;
+  border:none;
+  padding:10px 15px;
+  border-radius:5px;
+  font-size:16px;
+  z-index:10000;
+}
 
-  .films-container {
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
-    gap:15px;
-    padding:15px;
-  }
+#loader {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  z-index:10001;
+  display:none;
+}
 
-  .film {
-    background:#111;
-    border-radius:10px;
-    overflow:hidden;
-    cursor:pointer;
-    transition:0.3s;
-    position:relative;
-  }
+.spinner {
+  width:60px;
+  height:60px;
+  border:6px solid #333;
+  border-top:6px solid red;
+  border-radius:50%;
+  animation: spin 1s linear infinite;
+}
 
-  .film:hover {
-    transform: scale(1.08);
-    box-shadow:0 0 20px rgba(255,0,0,0.6);
-  }
+@keyframes spin {
+  0% {transform:rotate(0deg);}
+  100% {transform:rotate(360deg);}
+}
 
-  .film img {
-    width:100%;
-    height:250px;
-    object-fit:cover;
-  }
+.films-container {
+  display:grid;
+  grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+  gap:15px;
+  padding:15px;
+}
 
-  .film-info {
-    position:absolute;
-    bottom:0;
-    width:100%;
-    background:rgba(0,0,0,0.7);
-    padding:8px;
-    font-size:13px;
-    opacity:0;
-    transition:0.3s;
-  }
+.film {
+  background:#111;
+  border-radius:10px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:0.3s;
+  position:relative;
+}
 
-  .film:hover .film-info { opacity:1; }
+.film:hover {
+  transform: scale(1.08);
+  box-shadow:0 0 20px rgba(255,0,0,0.6);
+}
+
+.film img {
+  width:100%;
+  height:250px;
+  object-fit:cover;
+}
+
+.film-info {
+  position:absolute;
+  bottom:0;
+  width:100%;
+  background:rgba(0,0,0,0.7);
+  padding:8px;
+  font-size:13px;
+  opacity:0;
+  transition:0.3s;
+}
+
+.film:hover .film-info { opacity:1; }
 </style>
 </head>
 <body>
@@ -97,106 +120,103 @@
 
 <div id="overlay">
   <button class="close-btn" onclick="closeOverlay()">X</button>
+  <div id="loader"><div class="spinner"></div></div>
   <iframe id="player" allowfullscreen></iframe>
 </div>
 
 <div class="films-container" id="films"></div>
 
 <script>
+/* ✅ JSON INTACT */
 const JSON_URL = "https://script.google.com/macros/s/AKfycbw8wo-q79mnWgnHZQXxqU07EVIVbSFfj3onOal23oC7LJTgyZnhm1a452bwUTuU3Eoj/exec";
 
 async function verifierCodeInstant() {
   const code = localStorage.getItem("babi_code");
-  if (!code) {
+  if (!code) { window.location.href = "acces.html"; return false; }
+  const res = await fetch(JSON_URL);
+  const data = await res.json();
+  if (!data[code]) {
+    alert("Votre code n'est plus valide !");
+    localStorage.removeItem("babi_code");
     window.location.href = "acces.html";
     return false;
   }
-
-  try {
-    const res = await fetch(JSON_URL);
-    const data = await res.json();
-    if (!data[code]) {
-      alert("Votre code n'est plus valide !");
-      localStorage.removeItem("babi_code");
-      window.location.href = "acces.html";
-      return false;
-    }
-    return true;
-  } catch(e){
-    return false;
-  }
+  return true;
 }
 verifierCodeInstant();
 
+/* ✅ 30 FILMS ÉCRITS MANUELLEMENT */
 const films = [
-  {
-    titre:"Titanic",
-    image:"image1.jpg",
-    youtube:"https://odysee.com/$/embed/@TicTac:8/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6",
-    description:"Une histoire d’amour tragique entre Jack et Rose à bord du légendaire Titanic."
-  },
+{
+  titre:"Titanic",
+  description:"Une histoire d’amour tragique entre un jeune artiste pauvre et une riche héritière à bord du plus grand paquebot jamais construit. Entre passion, drame et destin, le naufrage du Titanic bouleverse leurs vies à jamais.",
+  image:"image1.jpg",
+  youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6"
+},
+{ titre:"L’Exil", description:"Un homme fuit son passé pour recommencer une nouvelle vie, mais ses démons le rattrapent dans une quête pleine de tensions et de révélations.", image:"image2.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Dernier Espoir", description:"Dans un monde en ruine, une jeune femme lutte pour sauver sa famille, affrontant dangers, trahisons et choix impossibles.", image:"image3.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Trahison Noire", description:"Un ancien policier plongé dans un vaste complot découvre que ses alliés sont devenus ses pires ennemis.", image:"image4.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Au-delà du Silence", description:"Une enquête journalistique révèle une vérité enterrée depuis des décennies, au péril de plusieurs vies.", image:"image5.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"La Ruée", description:"Dans une ville gangrenée par la corruption, un jeune ambitieux tente de s’imposer dans un monde impitoyable.", image:"image6.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"L’Ombre Rouge", description:"Un tueur invisible sème la terreur tandis qu’un inspecteur lutte contre ses propres failles.", image:"image7.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Dernière Mission", description:"Une équipe d’élite est envoyée dans une opération secrète où chaque erreur est fatale.", image:"image8.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Cœur Brisé", description:"Une histoire d’amour bouleversante entre deux êtres séparés par les réalités de la vie.", image:"image9.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"La Chute", description:"L’ascension fulgurante d’un homme d’affaires suivie de sa descente aux enfers.", image:"image10.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
 
-  { titre:"Film 2", image:"image2.jpg", youtube:"https://odysee.com/$/embed/video2", description:"Film d’action explosif." },
-  { titre:"Film 3", image:"image3.jpg", youtube:"https://odysee.com/$/embed/video3", description:"Drame poignant." },
-  { titre:"Film 4", image:"image4.jpg", youtube:"https://odysee.com/$/embed/video4", description:"Thriller haletant." },
-  { titre:"Film 5", image:"image5.jpg", youtube:"https://odysee.com/$/embed/video5", description:"Comédie romantique." },
+{ titre:"Rédemption", description:"Un ancien criminel cherche le pardon dans une société qui refuse d’oublier.", image:"image11.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"L’Ultime Combat", description:"Deux rivaux s’affrontent dans une bataille où seule la survie compte.", image:"image12.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Zone Interdite", description:"Une équipe pénètre dans un territoire interdit où aucune loi n’existe.", image:"image13.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"La Promesse", description:"Un serment fait dans l’enfance bouleverse le destin de plusieurs générations.", image:"image14.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Nuit Sanglante", description:"Une nuit d’horreur où chaque décision peut coûter la vie.", image:"image15.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
 
-  { titre:"Film 6", image:"image6.jpg", youtube:"https://odysee.com/$/embed/video6", description:"Aventure spectaculaire." },
-  { titre:"Film 7", image:"image7.jpg", youtube:"https://odysee.com/$/embed/video7", description:"Science-fiction futuriste." },
-  { titre:"Film 8", image:"image8.jpg", youtube:"https://odysee.com/$/embed/video8", description:"Film historique." },
-  { titre:"Film 9", image:"image9.jpg", youtube:"https://odysee.com/$/embed/video9", description:"Enquête policière." },
-  { titre:"Film 10", image:"image10.jpg", youtube:"https://odysee.com/$/embed/video10", description:"Film d’horreur intense." },
+{ titre:"L’Évasion", description:"Un prisonnier ingénieux organise une fuite impossible.", image:"image16.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Le Pacte", description:"Un accord dangereux lie plusieurs destins.", image:"image17.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Tempête", description:"Une catastrophe naturelle plonge une ville dans le chaos.", image:"image18.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Double Jeu", description:"Un agent infiltré risque chaque jour d’être démasqué.", image:"image19.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Rupture", description:"Une séparation brutale révèle des secrets longtemps cachés.", image:"image20.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
 
-  { titre:"Film 11", image:"image11.jpg", youtube:"https://odysee.com/$/embed/video11", description:"Émotion garantie." },
-  { titre:"Film 12", image:"image12.jpg", youtube:"https://odysee.com/$/embed/video12", description:"Suspense total." },
-  { titre:"Film 13", image:"image13.jpg", youtube:"https://odysee.com/$/embed/video13", description:"Aventure familiale." },
-  { titre:"Film 14", image:"image14.jpg", youtube:"https://odysee.com/$/embed/video14", description:"Action non-stop." },
-  { titre:"Film 15", image:"image15.jpg", youtube:"https://odysee.com/$/embed/video15", description:"Drame romantique." },
+{ titre:"La Traversée", description:"Voyage périlleux à travers une terre hostile.", image:"image21.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Le Survivant", description:"Seul contre tous après une catastrophe mondiale.", image:"image22.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"L’Affaire", description:"Un scandale éclate au sommet de l’État.", image:"image23.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"La Frontière", description:"Un territoire disputé où règne la guerre.", image:"image24.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Le Jugement", description:"Un procès bouleversant change la vie de tous.", image:"image25.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
 
-  { titre:"Film 16", image:"image16.jpg", youtube:"https://odysee.com/$/embed/video16", description:"Film catastrophe." },
-  { titre:"Film 17", image:"image17.jpg", youtube:"https://odysee.com/$/embed/video17", description:"Film mystère." },
-  { titre:"Film 18", image:"image18.jpg", youtube:"https://odysee.com/$/embed/video18", description:"Film biographique." },
-  { titre:"Film 19", image:"image19.jpg", youtube:"https://odysee.com/$/embed/video19", description:"Action militaire." },
-  { titre:"Film 20", image:"image20.jpg", youtube:"https://odysee.com/$/embed/video20", description:"Film de survie." },
-
-  { titre:"Film 21", image:"image21.jpg", youtube:"https://odysee.com/$/embed/video21", description:"Film de braquage." },
-  { titre:"Film 22", image:"image22.jpg", youtube:"https://odysee.com/$/embed/video22", description:"Film judiciaire." },
-  { titre:"Film 23", image:"image23.jpg", youtube:"https://odysee.com/$/embed/video23", description:"Histoire vraie." },
-  { titre:"Film 24", image:"image24.jpg", youtube:"https://odysee.com/$/embed/video24", description:"Drame social." },
-  { titre:"Film 25", image:"image25.jpg", youtube:"https://odysee.com/$/embed/video25", description:"Film psychologique." },
-
-  { titre:"Film 26", image:"image26.jpg", youtube:"https://odysee.com/$/embed/video26", description:"Film d'espionnage." },
-  { titre:"Film 27", image:"image27.jpg", youtube:"https://odysee.com/$/embed/video27", description:"Film fantastique." },
-  { titre:"Film 28", image:"image28.jpg", youtube:"https://odysee.com/$/embed/video28", description:"Film jeunesse." },
-  { titre:"Film 29", image:"image29.jpg", youtube:"https://odysee.com/$/embed/video29", description:"Film de guerre." },
-  { titre:"Film 30", image:"image30.jpg", youtube:"https://odysee.com/$/embed/video30", description:"Film épique." }
+{ titre:"Risque Zéro", description:"Braquage de haut niveau où chaque seconde compte.", image:"image26.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Ultimatum", description:"Un compte à rebours s’enclenche contre toute une ville.", image:"image27.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Fuite Finale", description:"Une cavale à travers plusieurs pays sous la menace constante.", image:"image28.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"L’Héritage", description:"Un secret de famille bouleverse plusieurs générations.", image:"image29.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" },
+{ titre:"Résistance", description:"Un groupe clandestin lutte contre une dictature.", image:"image30.jpg", youtube:"https://odysee.com/$/embed/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6" }
 ];
 
 const container = document.getElementById("films");
 const overlay = document.getElementById("overlay");
 const player = document.getElementById("player");
+const loader = document.getElementById("loader");
 
 function openOverlay(film) {
   verifierCodeInstant().then(valid => {
     if (!valid) return;
 
     overlay.style.display = "block";
+    loader.style.display = "block";
+    player.src = "";
+
+    if (screen.orientation && screen.orientation.lock) {
+      screen.orientation.lock("landscape").catch(()=>{});
+    }
 
     setTimeout(() => {
-      player.src = film.youtube + "?autoplay=1&mute=0";
-    }, 600);
-
-    setTimeout(() => {
-      if (screen.orientation && screen.orientation.lock) {
-        screen.orientation.lock("landscape").catch(()=>{});
-      }
-    }, 900);
+      player.src = film.youtube + "?autoplay=1&mute=1";
+    }, 400);
   });
 }
+
+player.onload = () => { loader.style.display = "none"; };
 
 function closeOverlay() {
   overlay.style.display = "none";
   player.src = "";
+  loader.style.display = "none";
   if (screen.orientation && screen.orientation.unlock) {
     screen.orientation.unlock();
   }
