@@ -11,18 +11,57 @@ body,html{width:100%;height:100%;background:#000;color:#fff}
 header{background:#000;color:red;font-size:24px;font-weight:bold;text-align:center;padding:15px;border-bottom:1px solid #222}
 
 #overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:9999;overflow:hidden}
-#overlay iframe{position:absolute;top:-180px;left:0;width:100%;height:calc(100% + 260px);border:none}
 
-.close-btn{position:absolute;top:15px;right:15px;background:red;color:white;border:none;padding:10px 15px;border-radius:5px;font-size:16px;z-index:10001}
+#overlay iframe{
+  position:absolute;
+  top:-220px;
+  left:0;
+  width:100%;
+  height:calc(100% + 220px);
+  border:none;
+}
 
-#loader{position:absolute;width:100%;height:100%;background:#000;display:flex;justify-content:center;align-items:center;flex-direction:column;color:white;z-index:10000}
+.close-btn{
+  position:absolute;
+  top:10px;
+  right:10px;
+  background:red;
+  color:white;
+  border:none;
+  padding:10px 15px;
+  border-radius:5px;
+  font-size:16px;
+  z-index:10001;
+}
+
+#loader{
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  color:white;
+  z-index:10000
+}
 #progress{margin-top:15px;font-size:20px}
 
 .films-container{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;padding:15px}
 .film{background:#111;border-radius:10px;overflow:hidden;cursor:pointer;transition:.3s;position:relative}
 .film:hover{transform:scale(1.05);box-shadow:0 0 15px red}
 .film img{width:100%;height:250px;object-fit:cover}
-.film-info{position:absolute;bottom:0;background:rgba(0,0,0,.7);width:100%;padding:10px;font-size:13px;opacity:0;transition:.3s}
+.film-info{
+  position:absolute;
+  bottom:0;
+  background:rgba(0,0,0,.7);
+  width:100%;
+  padding:10px;
+  font-size:13px;
+  opacity:0;
+  transition:.3s
+}
 .film:hover .film-info{opacity:1}
 </style>
 </head>
@@ -37,7 +76,7 @@ header{background:#000;color:red;font-size:24px;font-weight:bold;text-align:cent
     <div id="progress">0%</div>
   </div>
   <button class="close-btn" onclick="closeOverlay()">X</button>
-  <iframe id="player" allowfullscreen></iframe>
+  <iframe id="player" allow="autoplay; fullscreen"></iframe>
 </div>
 
 <div class="films-container" id="films"></div>
@@ -60,32 +99,68 @@ async function verifierCodeInstant(){
 }
 verifierCodeInstant();
 
+/* ✅ 10 FILMS EXACTEMENT */
 const films = [
 {
  titre:"Titanic",
  image:"titanic.jpg",
  youtube:"https://odysee.com/$/embed/@TicTac:8/Titanic-Streaming-VF-Film-Complet-Gratuit---Top-Film-Streaming:6",
- description:"Une romance tragique et inoubliable entre deux jeunes de classes sociales opposées à bord du plus grand paquebot jamais construit."
+ description:"Une romance tragique entre deux jeunes issus de classes sociales opposées à bord du paquebot Titanic. Un film mythique mêlant amour, drame et catastrophe historique."
 },
-{titre:"Film 2",image:"film2.jpg",youtube:"https://example.com",description:"Un thriller intense où chaque décision peut coûter la vie."},
-{titre:"Film 3",image:"film3.jpg",youtube:"https://example.com",description:"Un drame familial émouvant sur fond de secrets et de rédemption."},
-{titre:"Film 4",image:"film4.jpg",youtube:"https://example.com",description:"Une aventure spectaculaire dans un monde dangereux et inconnu."},
-{titre:"Film 5",image:"film5.jpg",youtube:"https://example.com",description:"Une histoire d’amour impossible dans un contexte de guerre."},
-{titre:"Film 6",image:"film6.jpg",youtube:"https://example.com",description:"Un polar sombre où la vérité est plus dangereuse que le mensonge."},
-{titre:"Film 7",image:"film7.jpg",youtube:"https://example.com",description:"Un jeune héros confronté à son destin dans un combat épique."},
-{titre:"Film 8",image:"film8.jpg",youtube:"https://example.com",description:"Un film d'action explosif où la survie est en jeu à chaque instant."},
-{titre:"Film 9",image:"film9.jpg",youtube:"https://example.com",description:"Une enquête haletante au cœur d’un vaste complot international."},
-{titre:"Film 10",image:"film10.jpg",youtube:"https://example.com",description:"Un combat intérieur entre le bien et le mal dans un monde violent."},
-{titre:"Film 11",image:"film11.jpg",youtube:"https://example.com",description:"Une ascension fulgurante suivie d’une chute brutale et tragique."},
-{titre:"Film 12",image:"film12.jpg",youtube:"https://example.com",description:"Un groupe d’amis piégés dans une situation sans retour possible."},
-{titre:"Film 13",image:"film13.jpg",youtube:"https://example.com",description:"Une mission secrète où chaque erreur peut être fatale."},
-{titre:"Film 14",image:"film14.jpg",youtube:"https://example.com",description:"Un amour interdit dans une société dominée par la peur."},
-{titre:"Film 15",image:"film15.jpg",youtube:"https://example.com",description:"Une course contre la montre pour éviter une catastrophe mondiale."},
-{titre:"Film 16",image:"film16.jpg",youtube:"https://example.com",description:"Un héros solitaire luttant contre une organisation puissante."},
-{titre:"Film 17",image:"film17.jpg",youtube:"https://example.com",description:"Un passé douloureux qui refait surface au moment le plus inattendu."},
-{titre:"Film 18",image:"film18.jpg",youtube:"https://example.com",description:"Une vengeance méticuleusement préparée pendant des années."},
-{titre:"Film 19",image:"film19.jpg",youtube:"https://example.com",description:"Un destin brisé qui renaît à travers le sacrifice."},
-{titre:"Film 20",image:"film20.jpg",youtube:"https://example.com",description:"Un dernier combat pour sauver ce qui reste de l’humanité."}
+{
+ titre:"Film 2 - Action Extrême",
+ image:"film2.jpg",
+ youtube:"https://example.com",
+ description:"Un ancien agent spécial reprend du service pour sauver sa famille prise en otage par un cartel dangereux."
+},
+{
+ titre:"Film 3 - La Dernière Chance",
+ image:"film3.jpg",
+ youtube:"https://example.com",
+ description:"Un homme condamné à tort tente de prouver son innocence avant son exécution imminente."
+},
+{
+ titre:"Film 4 - Amour Interdit",
+ image:"film4.jpg",
+ youtube:"https://example.com",
+ description:"Deux jeunes amoureux issus de familles rivales luttent pour vivre leur amour contre tous."
+},
+{
+ titre:"Film 5 - Mission Secrète",
+ image:"film5.jpg",
+ youtube:"https://example.com",
+ description:"Une équipe d’élite est envoyée en mission ultra confidentielle dans une zone de guerre."
+},
+{
+ titre:"Film 6 - Survivants",
+ image:"film6.jpg",
+ youtube:"https://example.com",
+ description:"Après un crash d’avion, des survivants doivent s’unir pour rester en vie dans une jungle hostile."
+},
+{
+ titre:"Film 7 - Le Hacker",
+ image:"film7.jpg",
+ youtube:"https://example.com",
+ description:"Un jeune prodige de l’informatique est traqué après avoir découvert un complot mondial."
+},
+{
+ titre:"Film 8 - Terreur Nocturne",
+ image:"film8.jpg",
+ youtube:"https://example.com",
+ description:"Dans une petite ville, d’étranges disparitions surviennent chaque nuit."
+},
+{
+ titre:"Film 9 - Destin Brisé",
+ image:"film9.jpg",
+ youtube:"https://example.com",
+ description:"Un boxeur prometteur voit sa carrière ruinée après un drame inattendu."
+},
+{
+ titre:"Film 10 - L’Ultime Combat",
+ image:"film10.jpg",
+ youtube:"https://example.com",
+ description:"Deux frères ennemis s’affrontent dans un combat décisif pour sauver leur honneur."
+}
 ];
 
 const container=document.getElementById("films");
@@ -97,32 +172,35 @@ const progress=document.getElementById("progress");
 function openOverlay(film){
   verifierCodeInstant().then(valid=>{
     if(!valid)return;
+
     overlay.style.display="block";
     loader.style.display="flex";
     progress.textContent="0%";
 
     let p=0;
     const loading=setInterval(()=>{
-      p+=5;
+      p+=4;
       progress.textContent=p+"%";
-      if(p>=100)clearInterval(loading);
+      if(p>=100){
+        clearInterval(loading);
+        loader.style.display="none";
+
+        setTimeout(()=>{
+          if(screen.orientation && screen.orientation.lock){
+            screen.orientation.lock("landscape").catch(()=>{});
+          }
+        },300);
+      }
     },100);
 
-    player.src=film.youtube+"?autoplay=1";
-    player.onload=()=>{loader.style.display="none"};
-
-    setTimeout(()=>{
-      if(screen.orientation&&screen.orientation.lock){
-        screen.orientation.lock("landscape").catch(()=>{});
-      }
-    },700);
+    player.src = film.youtube + "?autoplay=1";
   });
 }
 
 function closeOverlay(){
   overlay.style.display="none";
   player.src="";
-  if(screen.orientation&&screen.orientation.unlock){
+  if(screen.orientation && screen.orientation.unlock){
     screen.orientation.unlock();
   }
 }
